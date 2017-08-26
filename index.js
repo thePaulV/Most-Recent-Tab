@@ -115,3 +115,6 @@ browser.tabs.onActivated.addListener(tabActivated);
 
 // on window destroy, remove it from recents
 browser.windows.onRemoved.addListener(windowRemoved);
+
+// hook the toolbar icon
+browser.browserAction.onClicked.addListener(shortcutHit);

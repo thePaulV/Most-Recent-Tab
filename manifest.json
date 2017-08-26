@@ -20,9 +20,11 @@
     }
   },
 
-
-
-  "description": "Adds a keyboard shortcut to switch to the most recent tab. Useful to alternate between two tabs and to easy go back to your last tab if you switch to another briefly. Shortcut can be set by clicking preferences in addon manager.",
+  "browser_action": {
+    "default_icon": {
+      "48": "icon.png"
+    }
+  },
 
   "icons": {
     "48": "icon.png"
@@ -32,11 +34,8 @@
 
   "name": "Most Recent Tab",
   "author": "Paul V",
+  "description": "Adds a keyboard shortcut to switch to the most recent tab. Useful to alternate between two tabs and to easy go back to your last tab if you switch to another briefly. Shortcut can be set by clicking preferences in addon manager.",
+  "version": "1.0",
 
-
-
-  "permissions": [],
-
-  "version": "1.0"
-
+  "permissions": []
 }
