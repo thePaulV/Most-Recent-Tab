@@ -1,0 +1,42 @@
+{
+  "applications": {
+    "gecko": {
+      "strict_min_version": "42.0"
+    }
+  },
+
+  "background": {
+    "scripts": ["index.js"]
+  },
+
+
+  "commands": {
+    "most-recent-tab-command": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+Y",
+        "linux": "Ctrl+Shift+U"
+      },
+      "description": "Change to the most recent tab on this window."
+    }
+  },
+
+
+
+  "description": "Adds a keyboard shortcut to switch to the most recent tab. Useful to alternate between two tabs and to easy go back to your last tab if you switch to another briefly. Shortcut can be set by clicking preferences in addon manager.",
+
+  "icons": {
+    "48": "icon.png"
+  },
+
+  "manifest_version": 2,
+
+  "name": "Most Recent Tab",
+  "author": "Paul V",
+
+
+
+  "permissions": [],
+
+  "version": "0.1"
+
+}
