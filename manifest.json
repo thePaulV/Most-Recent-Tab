@@ -13,8 +13,8 @@
   "commands": {
     "most-recent-tab-command": {
       "suggested_key": {
-        "default": "Ctrl+Shift+Y",
-        "linux": "Ctrl+Shift+U"
+        "default": "Ctrl+Shift+1",
+        "linux": "Ctrl+Shift+1"
       },
       "description": "Change to the most recent tab on this window."
     }
