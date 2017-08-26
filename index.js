@@ -35,9 +35,11 @@
 
 let recents = new Map();
 
+// callback for "go to last tab" shortcut
 function shortcutHit() {
   console.log("shortcutHit() begin");
 
+  // load the current window
   var getting = browser.windows.getCurrent({populate: true});
   getting.then((windowInfo) => {
     if (windowInfo.type != "normal") {
@@ -62,6 +64,7 @@ function shortcutHit() {
   console.log("shortcutHit() end");
 }
 
+// callback when a tab is activated
 function tabActivated(newTabInfo) {
   console.log("tabActivated(newTabInfo) begin");
   // first tab for this window
@@ -83,19 +86,20 @@ function tabActivated(newTabInfo) {
   console.log("tabActivated(newTabInfo) end");
 }
 
-function saveCurrentWindow(windowInfo) {
-  console.debug("Current window loaded. Id: " + windowInfo.id + " of type " + windowInfo.type);
-  //if (windowInfo.type === "normal") {
-  //  recents[currentWindowId] = windowInfo.id;
-  //}
+// callback when a window is removed
+function windowRemoved(windowId) {
+  // the window has been destroyed, so we can stop tracking tabs for it
+  console.log(`Window ${windowId} deleted, removing key.`);
+  recents.delete(windowId);
 }
 
+
+// General error handler, logs the error for debugging.
 function onError(error) {
   console.log(`Error: ${error}`);
 }
 
-
-
+// Hook the keyboard shortcut
 browser.commands.onCommand.addListener((command) => {
   switch(command) {
     case "most-recent-tab-command":
@@ -106,12 +110,8 @@ browser.commands.onCommand.addListener((command) => {
 	};
 });
 
-
-browser.windows.onFocusChanged.addListener((windowId) => {
-  var getting = browser.windows.get(windowId, {populate: true});
-  getting.then(saveCurrentWindow, onError);
-});
-
+// hook tab change to track history
 browser.tabs.onActivated.addListener(tabActivated);
 
-//TODO: on window destroy, remove it from recents
+// on window destroy, remove it from recents
+browser.windows.onRemoved.addListener(windowRemoved);
