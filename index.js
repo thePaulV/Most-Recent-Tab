@@ -39,39 +39,45 @@
   where current is the current tab and last is the previous tab
   */
 let recents = new Map();
+const debugging = false;
+
+function debug_log(...rest) {
+  if (debugging)
+    console.log.apply(console, rest);
+}
 
 // callback for "go to last tab" shortcut
 function shortcutHit() {
-  console.log("shortcutHit() begin");
+  debug_log("shortcutHit() begin");
 
   // load the current window
   var getting = browser.windows.getCurrent({populate: true});
   getting.then((windowInfo) => {
     if (windowInfo.type != "normal") {
-      console.log (`Current window is of type '${windowInfo.type}', ignoring`);
+      debug_log (`Current window is of type '${windowInfo.type}', ignoring`);
       return;
     }
 
     if (!recents.has(windowInfo.id)) {
-      console.log (`Nothing known about ${windowInfo.id}`);
+      debug_log (`Nothing known about ${windowInfo.id}`);
       return; //no info on this window to use
     }
 
     let oldState = recents.get(windowInfo.id);
 
-    console.log("Activating tab id ", oldState.last);
+    debug_log("Activating tab id ", oldState.last);
     browser.tabs.update(oldState.last,{
       active: true
     });
 
   }, onError);
   
-  console.log("shortcutHit() end");
+  debug_log("shortcutHit() end");
 }
 
 // callback when a tab is activated
 function tabActivated(newTabInfo) {
-  console.log("tabActivated(newTabInfo) begin");
+  debug_log("tabActivated(newTabInfo) begin");
   // first tab for this window
   if (!recents.has(newTabInfo.windowId)) {
     recents.set(newTabInfo.windowId, {
@@ -88,20 +94,20 @@ function tabActivated(newTabInfo) {
     current: newTabInfo.tabId
   };
   recents.set(newTabInfo.windowId, newState);
-  console.log("tabActivated(newTabInfo) end");
+  debug_log("tabActivated(newTabInfo) end");
 }
 
 // callback when a window is removed
 function windowRemoved(windowId) {
   // the window has been destroyed, so we can stop tracking tabs for it
-  console.log(`Window ${windowId} deleted, removing key.`);
+  debug_log(`Window ${windowId} deleted, removing key.`);
   recents.delete(windowId);
 }
 
 
 // General error handler, logs the error for debugging.
 function onError(error) {
-  console.log(`Error: ${error}`);
+  debug_log(`Error: ${error}`);
 }
 
 // Hook the keyboard shortcut
@@ -111,7 +117,7 @@ browser.commands.onCommand.addListener((command) => {
       shortcutHit();
       break;
     default:
-      console.log ("onCommand event received unknown message: ", command);
+      debug_log ("onCommand event received unknown message: ", command);
 	};
 });
 
@@ -130,11 +136,11 @@ function initAWindow(windowInfoArray) {
     let windowId = windowInfo.id;
     let activeTab = windowInfo.tabs.filter((e) => e.active == true);
     if (activeTab.length != 1) {
-      console.log (`Error, no active tab for window ${windowId}`);
+      debug_log (`Error, no active tab for window ${windowId}`);
       continue;
     }
     let tabId = activeTab[0].id;
-    console.log (`Window ${windowId} has active tab ${tabId}`);
+    debug_log (`Window ${windowId} has active tab ${tabId}`);
 
     //save this info
     recents.set(windowId, {
