@@ -33,6 +33,11 @@
 
 "use strict";
 
+/** Global state, stores recent tabs for each window.
+  Each entry has a key = window id
+  value = {current, last}
+  where current is the current tab and last is the previous tab
+  */
 let recents = new Map();
 
 // callback for "go to last tab" shortcut
@@ -118,3 +123,33 @@ browser.windows.onRemoved.addListener(windowRemoved);
 
 // hook the toolbar icon
 browser.browserAction.onClicked.addListener(shortcutHit);
+
+// initialize the state with the current tab for each window
+function initAWindow(windowInfoArray) {
+  for (let windowInfo of windowInfoArray) {
+    let windowId = windowInfo.id;
+    let activeTab = windowInfo.tabs.filter((e) => e.active == true);
+    if (activeTab.length != 1) {
+      console.log (`Error, no active tab for window ${windowId}`);
+      continue;
+    }
+    let tabId = activeTab[0].id;
+    console.log (`Window ${windowId} has active tab ${tabId}`);
+
+    //save this info
+    recents.set(windowId, {
+      last: tabId,
+      current: tabId
+    })
+  }
+}
+
+function initWindows() {
+  var getting = browser.windows.getAll({
+    populate: true,
+    windowTypes: ["normal"]
+  });
+  getting.then(initAWindow, onError);
+}
+
+initWindows();
