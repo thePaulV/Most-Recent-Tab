@@ -5,6 +5,6 @@ Firefox extension that adds a keyboard shortcut to switch back to your most rece
 
 This is rewrite built on Firefox's new [WebExtensions API](https://hacks.mozilla.org/2017/06/cross-browser-extensions-available-now-in-firefox/), replacing the old Addon SDK version.
 
-It's distributed the [Firefox Addon site](https://addons.mozilla.org/en-US/firefox/addon/most-recent-tab/), although the new version is currently awaiting review.
+It's distributed the [Firefox Addon site](https://addons.mozilla.org/en-US/firefox/addon/most-recent-tab/).
 
 The code is licensed under the Mozilla Public License 2.0.
