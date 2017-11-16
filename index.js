@@ -101,6 +101,9 @@ browser.windows.onRemoved.addListener(windowRemoved);
 // hook the toolbar icon
 browser.browserAction.onClicked.addListener(shortcutHit);
 
+// hook the external message API to allow other addons to trigger the action
+browser.runtime.onMessageExternal.addListener((message, sender, sendResponse) => {shortcutHit(); return false});
+
 // initialize the state with the current tab for each window
 function initAWindow(windowInfoArray) {
   for (let windowInfo of windowInfoArray) {
