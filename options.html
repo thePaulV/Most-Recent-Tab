@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8">
+  </head>
+
+<body>
+  <form name"shortcutForm" id="shortcutForm">
+      <label for="shortcut">Keyboard shortcut:</label>
+      <input type="text" id="shortcut" name="shortcut"><span id="valid" width="20em"></span>
+      <button id="save">Save</button>
+      <button id="reset">Reset to Default</button>
+  </form>
+  <p>Keyboard shortcuts must include exactly one of Control (specify Ctrl on windows, MacCtrl on Apple), Alt or ⌘Command (specify as Ctrl on Mac) keys. They may optionally include Shift. The key can be any of:
+  <ul><li>the letters A-Z</li>
+    <li>the numbers 0-9</li>
+    <li>the function keys F1-F12</li>
+    <li>Comma, Period, Home, End, PageUp, PageDown, Space, Insert, Delete, Up, Down, Left, Right</li></ul>
+
+  <p>The command should be in the format Ctrl+Shift+1 (the default). Letters must be capitalized.</p>
+
+  <p>If a key combination is already used by the browser (for example, "Ctrl+P"), or by an existing add-on, then you can't override it. You will be allowed to define it, it will not trigger this addon. Unfortunately there is no way for this addon to detect that.</p>
+
+  <p>On Mac computers, "Ctrl" in the shortcut above means "⌘ Command" due to the cross-platform nature of Firefox. If you want control on mac, use "MacCtrl"</p>
+
+  <script src="options.js"></script>
+</body>
+
+</html>

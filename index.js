@@ -3,6 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 "use strict";
+const DEFAULT = "Ctrl+Shift+1";
 
 /** Global state, stores recent tabs for each window.
   Each entry has a key = window id
@@ -92,6 +93,21 @@ browser.commands.onCommand.addListener((command) => {
 	};
 });
 
+function updateFromOptions() {
+  var gettingItem = browser.storage.local.get("shortcut");
+  return gettingItem.then((res) => {
+    let shortcut = res.shortcut || DEFAULT;
+    debug_log("Updating command: " + shortcut);
+
+    browser.commands.update({
+      name: "most-recent-tab-command",
+      shortcut: shortcut
+    });
+  });
+}
+
+browser.storage.onChanged.addListener(updateFromOptions);
+
 // hook tab change to track history
 browser.tabs.onActivated.addListener(tabActivated);
 
@@ -133,3 +149,5 @@ function initWindows() {
 }
 
 initWindows();
+updateFromOptions();
+
