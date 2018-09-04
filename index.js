@@ -11,7 +11,44 @@ const DEFAULT = "Ctrl+Shift+1";
   where current is the current tab and last is the previous tab
   */
 let recents = new Map();
-const debugging = false;
+const debugging = true;
+
+function getMostRecentTab(windowId) {
+  debug_log("BEGIN getMostRecentTab");
+  if (!recents.has(windowId)) {
+    debug_log (`Nothing known about ${windowId}`);
+    return; //no info on this window to use
+  }
+
+  let oldState = recents.get(windowId);
+
+  debug_log("END getMostRecentTab");
+  return oldState.last;
+}
+
+function setMostRecentTab(windowId, tabId) {
+  // first tab for this window
+  if (!recents.has(windowId)) {
+    recents.set(windowId, {
+      last: tabId,
+      current: tabId
+    });
+    return;
+  }
+
+  // subsequent tabs
+  let oldState = recents.get(windowId);
+  let newState = {
+    last: oldState.current,
+    current: tabId
+  };
+  recents.set(windowId, newState);
+}
+
+function removeTab(windowId, tabId) {
+
+}
+
 
 function debug_log(...rest) {
   if (debugging)
@@ -30,15 +67,10 @@ function shortcutHit() {
       return;
     }
 
-    if (!recents.has(windowInfo.id)) {
-      debug_log (`Nothing known about ${windowInfo.id}`);
-      return; //no info on this window to use
-    }
+    let newTab = getMostRecentTab(windowInfo.id);
 
-    let oldState = recents.get(windowInfo.id);
-
-    debug_log("Activating tab id ", oldState.last);
-    browser.tabs.update(oldState.last,{
+    debug_log("Activating tab id ", newTab);
+    browser.tabs.update(newTab, {
       active: true
     });
 
@@ -50,22 +82,9 @@ function shortcutHit() {
 // callback when a tab is activated
 function tabActivated(newTabInfo) {
   debug_log("tabActivated(newTabInfo) begin");
-  // first tab for this window
-  if (!recents.has(newTabInfo.windowId)) {
-    recents.set(newTabInfo.windowId, {
-      last: newTabInfo.tabId,
-      current: newTabInfo.tabId
-    });
-    return;
-  }
 
-  // subsequent tabs
-  let oldState = recents.get(newTabInfo.windowId);
-  let newState = {
-    last: oldState.current,
-    current: newTabInfo.tabId
-  };
-  recents.set(newTabInfo.windowId, newState);
+  setMostRecentTab(newTabInfo.windowId, newTabInfo.tabId);
+
   debug_log("tabActivated(newTabInfo) end");
 }
 
@@ -75,7 +94,22 @@ function windowRemoved(windowId) {
   debug_log(`Window ${windowId} deleted, removing key.`);
   recents.delete(windowId);
 }
+// on window destroy, remove it from recents
+browser.windows.onRemoved.addListener(windowRemoved);
 
+// when a tab is destroyed, take it off the list
+function handleTabRemoved(tabId, removeInfo) {
+  debug_log("Tab: " + tabId + " is closing");
+  debug_log("Window ID: " + removeInfo.windowId);
+  debug_log("Window is closing: " + removeInfo.isWindowClosing);  
+
+  // if the whole window is closing, don't bother removing each element cleat it all up at once later
+  if (removeInfo.isWindowClosing) return;
+
+  remoteTab(removeInfo.windowId, tabId);
+}
+
+browser.tabs.onRemoved.addListener(handleTabRemoved);
 
 // General error handler, logs the error for debugging.
 function onError(error) {
@@ -111,9 +145,6 @@ browser.storage.onChanged.addListener(updateFromOptions);
 // hook tab change to track history
 browser.tabs.onActivated.addListener(tabActivated);
 
-// on window destroy, remove it from recents
-browser.windows.onRemoved.addListener(windowRemoved);
-
 // hook the toolbar icon
 browser.browserAction.onClicked.addListener(shortcutHit);
 
@@ -132,11 +163,7 @@ function initAWindow(windowInfoArray) {
     let tabId = activeTab[0].id;
     debug_log (`Window ${windowId} has active tab ${tabId}`);
 
-    //save this info
-    recents.set(windowId, {
-      last: tabId,
-      current: tabId
-    })
+    setMostRecentTab(windowId, tabId);
   }
 }
 
