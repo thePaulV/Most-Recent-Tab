@@ -13,7 +13,7 @@ const DEFAULT = "Ctrl+Shift+1";
 let recents = new Map();
 
 //TODO: set false before shipping
-const debugging = true;
+const debugging = false;
 
 function getMostRecentTab(windowId) {
   debug_log("BEGIN getMostRecentTab");
