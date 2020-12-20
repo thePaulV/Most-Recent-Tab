@@ -26,7 +26,7 @@ function getMostRecentTab(windowId) {
   let queue = recents.get(windowId);
   debug_log (`Window: ${windowId} has ${queue.length} tabs`);
   if (queue.length >= 2) {
-    let lastId = queue[queue.length-2].tabId;
+    let lastId = queue[1].tabId;
     debug_log(`last tab id is ${lastId}`);
     return lastId;
   }
@@ -50,7 +50,7 @@ function setMostRecentTab(windowId, tabId) {
   removeTab(windowId, tabId);  // <- remove it from the queue
   let queue = recents.get(windowId); // <- and add it to the top of the stack
   debug_log(`Pushing ${tabId}`);
-  queue.push({tabId: tabId});
+  queue.unshift({tabId: tabId});
   debug_log(`Success pushing ${tabId}`);
 }
 
