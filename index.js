@@ -17,6 +17,7 @@ const debugging = true;
 
 function getMostRecentTab(windowId) {
   debug_log("BEGIN getMostRecentTab");
+  debug_log(`Currently tracking ${recents.size} windows`);
   if (!recents.has(windowId)) {
     debug_log (`Nothing known about ${windowId}`);
     throw new Error("No recent tabs for this window");
@@ -87,7 +88,9 @@ function shortcutHit() {
       debug_log("Activating tab id ", newTab);
       browser.tabs.update(newTab, {
         active: true
-      });
+      }).then(() => {
+        debug_log(`Successfully switched window ${windowInfo.id} to tab ${newTab}`)
+      }, onError);
     } catch (ex) {
       debug_log(`Exception getting latest tab to activate: ${ex}`);
     }
