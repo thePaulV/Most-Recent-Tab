@@ -23,7 +23,7 @@
 
   "browser_action": {
     "default_icon": {
-      "48": "icon.png"
+      "64": "icon.png"
     }
   },
 
@@ -33,15 +33,15 @@
   },
 
   "icons": {
-    "48": "icon.png"
+    "64": "icon.png"
   },
 
   "manifest_version": 2,
 
   "name": "Most Recent Tab",
   "author": "Paul V",
-  "description": "Adds a keyboard shortcut and toolbar item to switch back to your most recently selected tab. Useful to alternate between two tabs and to easy go back to your last tab if you switch to another briefly. The shortcut is set to Control-shift-1 on Windows and Command-shift-1 on Mac. Funtionality to customize shortcuts is not yet available for WebExtensions.",
-  "version": "2.0",
+  "description": "Adds a keyboard shortcut and toolbar item to switch back to your most recently selected tab. Useful to alternate between two tabs and to easy go back to your last tab if you switch to another briefly. The shortcut is set to Control-shift-1 on Windows and Command-shift-1 on Mac.",
+  "version": "3.0",
 
   "permissions": ["storage"]
 }
