@@ -25,14 +25,7 @@ function getMostRecentTab(windowId) {
   let queue = recents.get(windowId);
   debug_log (`Window: ${windowId} has ${queue.length} tabs`);
   if (queue.length >= 2) {
-    let last = queue.splice(queue.length - 2, 1);
-    debug_log(last);
-    let lastId = undefined;
-    switch (last.length) {
-      case 0: debug_log("No last tab"); throw new Error ("No most recent tab"); break;
-      case 1: lastId = last[0].tabId; break;
-      default: debug_log ("Too many last tabs. This should never be reached"); throw new Error ("Unreachable code reached"); break;
-    }
+    let lastId = queue[queue.length-2].tabId;
     debug_log(`last tab id is ${lastId}`);
     return lastId;
   }
