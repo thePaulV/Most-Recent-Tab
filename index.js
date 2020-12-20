@@ -11,42 +11,63 @@ const DEFAULT = "Ctrl+Shift+1";
   where current is the current tab and last is the previous tab
   */
 let recents = new Map();
+
+//TODO: set false before shipping
 const debugging = true;
 
 function getMostRecentTab(windowId) {
   debug_log("BEGIN getMostRecentTab");
   if (!recents.has(windowId)) {
     debug_log (`Nothing known about ${windowId}`);
-    return; //no info on this window to use
+    throw new Error("No recent tabs for this window");
   }
 
-  let oldState = recents.get(windowId);
+  let queue = recents.get(windowId);
+  debug_log (`Window: ${windowId} has ${queue.length} tabs`);
+  if (queue.length >= 2) {
+    let last = queue.splice(queue.length - 2, 1);
+    debug_log(last);
+    let lastId = undefined;
+    switch (last.length) {
+      case 0: debug_log("No last tab"); throw new Error ("No most recent tab"); break;
+      case 1: lastId = last[0].tabId; break;
+      default: debug_log ("Too many last tabs. This should never be reached"); throw new Error ("Unreachable code reached"); break;
+    }
+    debug_log(`last tab id is ${lastId}`);
+    return lastId;
+  }
+  else {
+    debug_log(`Not enough tabs: ${queue.length}`);
+  }
 
   debug_log("END getMostRecentTab");
-  return oldState.last;
+
+  throw new Error("No most recent tab");
 }
 
 function setMostRecentTab(windowId, tabId) {
   // first tab for this window
   if (!recents.has(windowId)) {
-    recents.set(windowId, {
-      last: tabId,
-      current: tabId
-    });
-    return;
+    debug_log(`Initializing queue for windowId: ${windowId}`);
+    recents.set(windowId, []);
   }
 
-  // subsequent tabs
-  let oldState = recents.get(windowId);
-  let newState = {
-    last: oldState.current,
-    current: tabId
-  };
-  recents.set(windowId, newState);
+  // add the recent tab
+  removeTab(windowId, tabId);  // <- remove it from the queue
+  let queue = recents.get(windowId); // <- and add it to the top of the stack
+  debug_log(`Pushing ${tabId}`);
+  queue.push({tabId: tabId});
+  debug_log(`Success pushing ${tabId}`);
 }
 
 function removeTab(windowId, tabId) {
-
+  let queue = recents.get(windowId);
+  const index = queue.findIndex (el => el.tabId === tabId);
+  debug_log(`Found this item at index: ${index}`);
+  if (index >= 0) {
+    debug_log(`Removing tab at index: ${index}`);
+    queue.splice (index, 1);
+  }
 }
 
 
@@ -67,13 +88,16 @@ function shortcutHit() {
       return;
     }
 
-    let newTab = getMostRecentTab(windowInfo.id);
+    try {
+      let newTab = getMostRecentTab(windowInfo.id);
 
-    debug_log("Activating tab id ", newTab);
-    browser.tabs.update(newTab, {
-      active: true
-    });
-
+      debug_log("Activating tab id ", newTab);
+      browser.tabs.update(newTab, {
+        active: true
+      });
+    } catch (ex) {
+      debug_log(`Exception getting latest tab to activate: ${ex}`);
+    }
   }, onError);
   
   debug_log("shortcutHit() end");
@@ -82,6 +106,7 @@ function shortcutHit() {
 // callback when a tab is activated
 function tabActivated(newTabInfo) {
   debug_log("tabActivated(newTabInfo) begin");
+  debug_log(`tabActivated: window: ${newTabInfo.windowId}, tab: ${newTabInfo.tabId}`);
 
   setMostRecentTab(newTabInfo.windowId, newTabInfo.tabId);
 
@@ -103,10 +128,11 @@ function handleTabRemoved(tabId, removeInfo) {
   debug_log("Window ID: " + removeInfo.windowId);
   debug_log("Window is closing: " + removeInfo.isWindowClosing);  
 
-  // if the whole window is closing, don't bother removing each element cleat it all up at once later
+  // if the whole window is closing, don't bother removing each element clean it all up at once later
   if (removeInfo.isWindowClosing) return;
 
-  remoteTab(removeInfo.windowId, tabId);
+  // otherwise remove the tab
+  removeTab(removeInfo.windowId, tabId);
 }
 
 browser.tabs.onRemoved.addListener(handleTabRemoved);
