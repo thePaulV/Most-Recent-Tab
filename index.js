@@ -175,7 +175,7 @@ browser.storage.onChanged.addListener(updateFromOptions);
 browser.tabs.onActivated.addListener(tabActivated);
 
 // hook the toolbar icon
-browser.browserAction.onClicked.addListener(shortcutHit);
+browser.browserAction.onClicked.addListener(e => shortcutHit(0));
 
 // hook the external message API to allow other addons to trigger the action
 browser.runtime.onMessageExternal.addListener((message, sender, sendResponse) => {shortcutHit(); return false});
