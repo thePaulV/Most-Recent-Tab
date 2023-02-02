@@ -15,8 +15,8 @@ let recents = new Map();
 //TODO: set false before shipping
 const debugging = false;
 
-function getMostRecentTab(windowId) {
-  debug_log("BEGIN getMostRecentTab");
+function getMostRecentTab(windowId, skip = 0) {
+  debug_log("BEGIN getMostRecentTab", skip);
   debug_log(`Currently tracking ${recents.size} windows`);
   if (!recents.has(windowId)) {
     debug_log (`Nothing known about ${windowId}`);
@@ -25,8 +25,9 @@ function getMostRecentTab(windowId) {
 
   let queue = recents.get(windowId);
   debug_log (`Window: ${windowId} has ${queue.length} tabs`);
-  if (queue.length >= 2) {
-    let lastId = queue[1].tabId;
+  const min_length = 2+skip;
+  if (queue.length >= min_length) {
+    let lastId = queue[1+skip].tabId;
     debug_log(`last tab id is ${lastId}`);
     return lastId;
   }
@@ -71,8 +72,8 @@ function debug_log(...rest) {
 }
 
 // callback for "go to last tab" shortcut
-function shortcutHit() {
-  debug_log("shortcutHit() begin");
+function shortcutHit(skip = 0) {
+  debug_log("shortcutHit() begin", skip);
 
   // load the current window
   var getting = browser.windows.getCurrent({populate: true});
@@ -83,7 +84,7 @@ function shortcutHit() {
     }
 
     try {
-      let newTab = getMostRecentTab(windowInfo.id);
+      let newTab = getMostRecentTab(windowInfo.id, skip);
 
       debug_log("Activating tab id ", newTab);
       browser.tabs.update(newTab, {
@@ -143,6 +144,12 @@ browser.commands.onCommand.addListener((command) => {
   switch(command) {
     case "most-recent-tab-command":
       shortcutHit();
+      break;
+    case "most-recent-tab-command-second":
+      shortcutHit(1);
+      break;
+    case "most-recent-tab-command-third":
+      shortcutHit(2);
       break;
     default:
       debug_log ("onCommand event received unknown message: ", command);

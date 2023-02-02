@@ -17,7 +17,13 @@
         "default": "Ctrl+Shift+1",
         "linux": "Ctrl+Shift+1"
       },
-      "description": "Change to the most recent tab on this window."
+      "description": "Main: Jump to the previously viewed tab, the most recent tab"
+    },
+    "most-recent-tab-command-second": {
+      "description": "Optional: Jump to the second most recent tab"
+    },
+    "most-recent-tab-command-third": {
+      "description": "Optional: Jump to the third most recent tab"
     }
   },
 
@@ -41,7 +47,7 @@
   "name": "Most Recent Tab",
   "author": "Paul V",
   "description": "Adds a keyboard shortcut and toolbar item to switch back to your most recently selected tab. Useful to alternate between two tabs and to easy go back to your last tab if you switch to another briefly. The shortcut is set to Control-shift-1 on Windows and Command-shift-1 on Mac.",
-  "version": "3.0",
+  "version": "3.1",
 
   "permissions": ["storage"]
 }
